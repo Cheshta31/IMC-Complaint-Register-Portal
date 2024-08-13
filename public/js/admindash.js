@@ -117,7 +117,25 @@ async function createChart() {
 
 document.addEventListener('DOMContentLoaded', createChart);
 
-
+function logout() {
+    // Add logout functionality here
+    alert("Are you sure you want to log out ?");
+        // Add logout functionality here
+        //alert("Logged out!");\
+        fetch('/logout',{
+            method:'POST',
+            credentials:'include'
+        }).then(response => {
+            if(response.redirected){
+                window.location.href="/userlogin";
+            }
+            else{
+                alert('Failed to log out');
+            }
+        }).catch(error => {
+            console.log("Error = > ", error);
+        });
+}
 
 function togglePopup() {
     const popup = document.getElementById('profilePopup');

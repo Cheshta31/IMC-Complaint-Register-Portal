@@ -121,10 +121,58 @@ function navigateTo(option) {
     // }
 }
 
-// Close the popup when clicking outside of it
-window.onclick = function(event) {
-    const popup = document.getElementById('profilePopup');
-    if (event.target !== popup && !popup.contains(event.target) && event.target.className !== 'profile-button') {
-        popup.classList.remove('show');
+async function addUser(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const form = document.getElementById("newuser");
+    const formData = new FormData(form);
+
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+
+    try {
+        const response = await fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            //console.log(result.message);
+            alert(result.message);
+            console.log("User registered successfully");
+            form.reset();
+        } else {
+            const errorResult = await response.json();
+            alert("Not able to register the user");
+            console.error('Error:', errorResult.message)
+        }
+    } catch (error) {
+        console.error('Network error:', error);
     }
+}
+
+function logout() {
+    // Add logout functionality here
+    alert("Are you sure you want to log out ?");
+        // Add logout functionality here
+        //alert("Logged out!");\
+        fetch('/logout',{
+            method:'POST',
+            credentials:'include'
+        }).then(response => {
+            if(response.redirected){
+                window.location.href="/userlogin";
+            }
+            else{
+                alert('Failed to log out');
+            }
+        }).catch(error => {
+            console.log("Error = > ", error);
+        });
 }

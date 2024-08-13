@@ -51,7 +51,7 @@ async function sendOTP(formId) {
         });
 
         const data = await response.json();
-        alert(data.message);
+        alert("OTP Sent Successfully");
     } catch (error) {
         console.error('Error:', error);
     }

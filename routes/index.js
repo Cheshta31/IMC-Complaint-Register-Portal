@@ -5,6 +5,19 @@ const User = require('../models/user');
 const Admin = require('../models/admin');
 const OTP = require('../models/otp');
 const Complaint = require('../models/complaint');
+const XLSX= require('xlsx');
+const path= require('path');
+const fs= require('fs');
+
+router.post('/logout', (req,res)=>{
+    req.session.destroy(err=>{
+        if(err){
+            return res.status(500).send('Failed to log out');
+        }
+        res.clearCookie('connect.sid');
+        res.redirect('/userlogin');
+    })
+});
 
 router.post('/loginuser', async (req, res) => {
     const { username, employeeID, email, password, otp } = req.body;
@@ -132,13 +145,70 @@ router.post('/newcomplaint', async (req, res) => {
     }
 });
 
-router.get('/admindash', async (req, res) => {
+router.get('/dashboard', async (req, res) => {
     try {
         const users = await User.find({});
         const admins = await Admin.find({});
         const complaints = await Complaint.find();
         const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
         const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
+
+        res.render('dashboard', {
+            users,
+            admins,
+            complaints,
+            pendingCount,
+            solvedCount
+        });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+router.get('/mycomplaint', async (req, res) => {
+    try {
+        const users = await User.find({});
+        const admins = await Admin.find({});
+        const complaints = await Complaint.find();
+        const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
+        const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
+
+        res.render('mycomplaint', {
+            users,
+            admins,
+            complaints,
+            pendingCount,
+            solvedCount
+        });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+// Route to get complaints for a specific user
+router.get('/mycomplaints/:employeeID', async (req, res) => {
+    try {
+        const employeeID = req.params.employeeID;
+        const user = await User.findById(employeeID);
+        
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        const complaints = await Complaint.find({ employeeCode: user.employeeCode });
+        res.render('userComplaints', { user, complaints });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+router.get('/admindash', async (req, res) => {
+    try {
+        const users = await User.find({});
+        const admins = await Admin.find({});
+        const complaints = await Complaint.find();
+        //const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
+        //const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
 
         res.render('admindash', {
             users,
@@ -173,6 +243,7 @@ router.get('/totaladmin', async (req, res) => {
     }
 });
 
+//Router to display complaint data from server to the front end
 router.get('/totalcomplaints', async (req, res) => {
     try {
         const complaints = await Complaint.find();
@@ -187,6 +258,19 @@ router.get('/totalcomplaints', async (req, res) => {
     } catch (error) {
         res.status(500).send(error.message);
     }
+});
+
+// Route to get a specific complaint by ID
+router.get('/totalcomplaints/:id', (req, res) => {
+    const complaintId = req.params.id;
+    Complaint.findById(complaintId)
+        .then(complaint => {
+            if (!complaint) {
+                return res.status(404).send('Complaint not found');
+            }
+            res.json(complaint);
+        })
+        .catch(err => res.status(500).send('Error retrieving complaint data'));
 });
 
 //route to get complaint counts for displaying in the chart
@@ -235,5 +319,106 @@ router.delete('/totaladmin/:employeeID', async (req, res) => {
         res.status(500).json({ message: 'Error deleting admin' });
     }
 });
+
+router.get('/download/excel', async (req,res) => {
+    try {
+        const complaints = await Complaint.find({} , 'employeeName employeeCode complaintTitle department email complaintDetails status').lean();
+        console.log(complaints);
+        const dataToExport = complaints.map(complaint => ({
+            Employee_Name:complaint.employeeName,
+            Employee_Code:complaint.employeeCode,
+            Complaint_Title:complaint.complaintTitle,
+            Department:complaint.department,
+            Employee_Email:complaint.email,
+            Complaint_Details:complaint.complaintDetails,
+            Status:complaint.status,
+        }))
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook,worksheet,'Complaints');
+        const filePath = path.join(__dirname,'complaints.xlsx');
+        XLSX.writeFile(workbook,filePath);
+        res.download(filePath,(err) => 
+        {
+            if(err)
+            {
+                console.log(err);
+            }
+            fs.unlinkSync(filePath);
+        });
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).send('Error generating excel file');
+    }
+})
+
+//download excel file for pending complaints
+router.get('/download/pending-excel', async (req,res) => {
+    try {
+        const complaints = await Complaint.find({status:'Pending'} , 'employeeName employeeCode complaintTitle department email complaintDetails status').lean();
+        console.log(complaints);
+        const dataToExport = complaints.map(complaint => ({
+            Employee_Name:complaint.employeeName,
+            Employee_Code:complaint.employeeCode,
+            Complaint_Title:complaint.complaintTitle,
+            Department:complaint.department,
+            Employee_Email:complaint.email,
+            Complaint_Details:complaint.complaintDetails,
+            Status:complaint.status,
+        }))
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook,worksheet,'Complaints');
+        const filePath = path.join(__dirname,'pending-complaints.xlsx');
+        XLSX.writeFile(workbook,filePath);
+        res.download(filePath,(err) => 
+        {
+            if(err)
+            {
+                console.log(err);
+            }
+            fs.unlinkSync(filePath);
+        });
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).send('Error generating pending complaints excel file');
+    }
+})
+
+//download excel file for solved complaints
+router.get('/download/solved-excel', async (req,res) => {
+    try {
+        const complaints = await Complaint.find({status:'Completed'} , 'employeeName employeeCode complaintTitle department email complaintDetails status').lean();
+        console.log(complaints);
+        const dataToExport = complaints.map(complaint => ({
+            Employee_Name:complaint.employeeName,
+            Employee_Code:complaint.employeeCode,
+            Complaint_Title:complaint.complaintTitle,
+            Department:complaint.department,
+            Employee_Email:complaint.email,
+            Complaint_Details:complaint.complaintDetails,
+            Status:complaint.status,
+        }))
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook,worksheet,'Complaints');
+        const filePath = path.join(__dirname,'solved-complaints.xlsx');
+        XLSX.writeFile(workbook,filePath);
+        res.download(filePath,(err) => 
+        {
+            if(err)
+            {
+                console.log(err);
+            }
+            fs.unlinkSync(filePath);
+        });
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).send('Error generating solved complaints excel file');
+    }
+})
 
 module.exports = router;

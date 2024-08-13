@@ -97,9 +97,25 @@ function toggleDropdown() {
     }
 }
 
+//logout
 function logout() {
     // Add logout functionality here
-    alert("Logged out!");
+    alert("Are you sure you want to log out ?");
+        // Add logout functionality here
+        //alert("Logged out!");\
+        fetch('/logout',{
+            method:'POST',
+            credentials:'include'
+        }).then(response => {
+            if(response.redirected){
+                window.location.href="/userlogin";
+            }
+            else{
+                alert('Failed to log out');
+            }
+        }).catch(error => {
+            console.log("Error = > ", error);
+        });
 }
 
 // Close the dropdown if the user clicks outside of it

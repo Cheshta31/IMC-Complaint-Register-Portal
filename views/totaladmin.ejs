@@ -55,7 +55,7 @@
             <li>
                 <a href="#" class="logout">
                     <i class='bx bxs-log-out-circle'></i>
-                    <span class="text">Logout</span>
+                    <span class="text" onclick="logout()">Logout</span>
                 </a>
             </li>
         </ul>
@@ -67,13 +67,7 @@
         <!-- NAVBAR -->
         <nav>
             <i class='bx bx-menu'></i>
-            <a href="#" class="nav-link">Department</a>
-            <form action="#">
-                <div class="form-input">
-                    <input type="search" placeholder="Search...">
-                    <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
-                </div>
-            </form>
+            
             <input type="checkbox" id="switch-mode" hidden>
             <label for="switch-mode" class="switch-mode"></label>
             <div class="profile-button" onclick="togglePopup()">
@@ -104,56 +98,20 @@
                     <p>Employee ID <i class="fas fa-id-badge"></i></p>
                     <p class="profile-email">1234</p>
                 </div>
-                <div class="popup-options">
-                    <ul>
-                        <li onclick="navigateTo('logout')">Logout</li>
-                    </ul>
-                </div>
             </div>
         </nav>
         <!-- NAVBAR -->
 
         <!-- MAIN -->
         <main>
-            <div class="head-title">
-                <div class="left">
-                    <h1>Admins</h1>
-                    <ul class="breadcrumb">
-                        <li>
-                            <a href="/admindash">Dashboard</a>
-                        </li>
-                        <li><i class='bx bx-chevron-right'></i></li>
-                        <li>
-                            <a class="active" href="#">Home</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
+            
             <!--MAIN1-->
-            <ul class="container">
-                <div class="form-group">
-                    <label for="department">Department *</label>
-                    <select id="department" name="department" required>
-                        <option value="" disabled selected>-Select-</option>
-                        <option value="IT">IT</option>
-                        <option value="HR">HR</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Operations">Operations</option>
-                        <option value="Admin">Admin</option>
-                    </select>
-                </div>
-                <form action="#">
-                    <div class="form-input">
-                        <input type="search" placeholder="Search...">
-                        <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
-                    </div>
-                </form>
-            </ul>
-
             <div class="head-title">
                 <div class="left">
                     <h1>All Admin</h1>
+                    <a href="#" download class="download-button">
+                        <i class='bx bx-download'></i> Download
+                    </a>
                 </div>
             </div>
 
@@ -165,10 +123,8 @@
                         <h3><%= admin.username %></h3>
                         <p><%= admin.employeeID %></p>
                         <p><%= admin.email %></p>
-                        <!--<p><%= admin.department %></p>-->
                         <div class="button-container">
                             <button class="user-button" onclick="deleteAdmin('<%= admin.employeeID %>')">Delete Admin</button>
-                            <!--<button class="user-button" onclick="updateAdmin('<%= admin.id %>')">Update Admin</button>-->
                         </div>
                     </span>
                 </li>

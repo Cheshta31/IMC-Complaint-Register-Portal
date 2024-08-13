@@ -46,7 +46,7 @@
             <ul class="logout-mode">
                 <li><a href="#">
                     <i class="uil uil-signout"></i>
-                    <span class="link-name">Logout</span>
+                    <span class="link-name" onclick="logout()">Logout</span>
                 </a></li>
 
                 <li class="mode">
@@ -66,13 +66,7 @@
     <section class="dashboard">
         <div class="top">
             <i class="uil uil-bars sidebar-toggle"></i>
-
-            <div class="search-box">
-                <i class="uil uil-search"></i>
-                <input type="text" placeholder="Search here...">
-            </div>
             
-            <!--<img src="images/avatar.svg" alt="">-->
             <nav1>
                 <a class="nav-link" href="#" onclick="toggleDropdown()">
                     <img src="/images/avatar.svg" style="width:40px; border-radius:50%;" />
@@ -83,7 +77,6 @@
                         <li>User ID: <span id="user-id">12345</span></li>
                         <li>Employee ID: <span id="employee-id">67890</span></li>
                         <li>Email ID: <span id="email-id">user@example.com</span></li>
-                        <li><a href="#" onclick="logout()">Logout</a></li>
                     </ul>
                 </div>
             </nav1>

@@ -55,7 +55,7 @@
             <li>
                 <a href="#" class="logout">
                     <i class='bx bxs-log-out-circle'></i>
-                    <span class="text">Logout</span>
+                    <span class="text" onclick="logout()">Logout</span>
                 </a>
             </li>
         </ul>
@@ -67,13 +67,6 @@
         <!-- NAVBAR -->
         <nav>
             <i class='bx bx-menu'></i>
-            <a href="#" class="nav-link">Department</a>
-            <form action="#">
-                <div class="form-input">
-                    <input type="search" placeholder="Search...">
-                    <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
-                </div>
-            </form>
             <input type="checkbox" id="switch-mode" hidden>
             <label for="switch-mode" class="switch-mode"></label>
             <div class="profile-button" onclick="togglePopup()">
@@ -103,12 +96,7 @@
                 <div class="popup-manage">
                     <p>Employee ID <i class="fas fa-id-badge"></i></p>
                     <p class="profile-email">1234</p>
-                </div>
-                <div class="popup-options">
-                    <ul>
-                        <li onclick="navigateTo('logout')">Logout</li>
-                    </ul>
-                </div>
+                </div>               
             </div>
         </nav>
         <!-- NAVBAR -->
@@ -117,16 +105,7 @@
         <main>
             <div class="head-title">
                 <div class="left">
-                    <h1>Total Complaints</h1>
-                    <ul class="breadcrumb">
-                        <li>
-                            <a href="/admindash">Dashboard</a>
-                        </li>
-                        <li><i class='bx bx-chevron-right'></i></li>
-                        <!--<li>
-                            <a class="active" href="#">Home</a>
-                        </li>-->
-                    </ul>
+                    <h1>Total Complaints</h1>                    
                 </div>
             </div>
 
@@ -135,45 +114,26 @@
                     <i class='bx bxs-message-dots'></i>
                     <span class="text">
                         <h3><%= complaints.length %></h3>
-                        <p>All Complaints</p>
+                        
+                        <a href="/download/excel"><p>All Complaints</p></a>
                     </span>
                 </li>
                 <li>
                     <i class='bx bxs-hourglass-top'></i>
                     <span class="text">
                         <h3><%= pendingCount %></h3>
-                        <p>Pending</p>
+                        <a href="/download/pending-excel"><p>Pending</p></a>
                     </span>
                 </li>
                 <li>
                     <i class='bx bxs-comment-check'></i>
                     <span class="text">
                         <h3><%= solvedCount %></h3>
-                        <p>Solved</p>
+                        <a href="/download/solved-excel"><p>Solved</p></a>
                     </span>
                 </li>
-            </ul>
-
-            <ul class="container">
-                <div class="form-group">
-                    <label for="department">Department *</label>
-                    <select id="department" name="department" required>
-                        <option value="" disabled selected>-Select-</option>
-                        <option value="IT">IT</option>
-                        <option value="HR">HR</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Operations">Operations</option>
-                        <option value="Admin">Admin</option>
-                    </select>
-                </div>
-                <form action="#">
-                    <div class="form-input">
-                        <input type="search" placeholder="Search...">
-                        <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
-                    </div>
-                </form>
-            </ul>
-
+            </ul>            
+            
             <div class="table-data">
                 <div class="order">
                     <div class="head">
@@ -203,11 +163,23 @@
                                     <td><%= complaint.email %></td>
                                     <td><%= new Date(complaint.complaintDate).toLocaleDateString() %></td>
                                     <td><span class="status <%= complaint.status.toLowerCase().replace(' ', '-') %>"><%= complaint.status %></span></td>
-                                    <td><button class="data-view" onclick="openModal('<%= complaint._id %>')">view</button></td>
+                                    <td><button class="data-view" onclick="openModal('<%= complaint._id %>')">View</button></td>
                                 </tr>
                             <% }) %>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Modal Structure -->
+            <div id="complaintModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h2>Complaint Details</h2>
+                    <div id="complaintData"></div>
+                    <div id="documentContainer">
+                        <!-- Document link or preview will be inserted here -->
+                    </div>
                 </div>
             </div>
             

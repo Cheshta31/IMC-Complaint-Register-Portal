@@ -10,16 +10,10 @@ router.get('/userlogin', (req, res) => {
     res.render('userlogin');  
 });
 
-router.get('/dashboard', (req, res) => {
-    res.render('dashboard'); 
-});
 
 router.get('/filecomplaint', (req, res) => {
     res.render('filecomplaint'); 
 });
 
-router.get('/mycomplaint', (req, res) => {
-    res.render('mycomplaint'); 
-});
 
 module.exports = router;
