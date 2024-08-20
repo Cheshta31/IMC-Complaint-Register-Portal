@@ -2,6 +2,11 @@
 const mongoose = require('mongoose');
 
 const complaintSchema = new mongoose.Schema({
+    complaintCode: {
+        type: String,
+        unique: true,
+        required: true
+    },
     employeeName: {
         type: String,
         required: true
@@ -33,8 +38,7 @@ const complaintSchema = new mongoose.Schema({
         required: true
     },
     complaintAttachment: {
-        type: String, // Assuming the file path or URL will be stored here
-        required: true
+        type: String  // Assuming the file path or URL will be stored here
     },
     status: {
         type: String,
@@ -45,7 +49,22 @@ const complaintSchema = new mongoose.Schema({
     timestamps: true
 });
 
-complaintSchema.pre('save', function(next) {
+async function generateUniqueComplaintCode() {
+    let code;
+    let existingComplaint;
+
+    do {
+        // Generate a random code
+        code = 'CMP-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+        // Check if the code already exists in the database
+        existingComplaint = await Complaint.findOne({ complaintCode: code });
+    } while (existingComplaint);
+
+    return code;
+}
+
+complaintSchema.pre('save', async function(next) {
     // Example condition to change status from Pending to In Progress
     if (this.isModified('status') && this.status === 'Pending') {
         this.status = 'In Progress';
@@ -54,6 +73,10 @@ complaintSchema.pre('save', function(next) {
     // Example condition to change status from In Progress to Completed
     if (this.isModified('status') && this.status === 'In Progress') {
         this.status = 'Completed';
+    }
+
+    if (!this.isNew) {
+        this.complaintCode = await generateUniqueComplaintCode();
     }
     next();
 });

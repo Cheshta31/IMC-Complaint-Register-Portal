@@ -74,9 +74,13 @@
                 <div id="dropdown" class="dropdown-content">
                     <img src="/img/avatar.svg" class="avatar-img" />
                     <ul>
-                        <li>User Name: <span id="user-id"><%= users.username %></span></li>
-                        <li>Employee ID: <span id="employee-id"><%= users.employeeID %></span></li>
-                        <li>Email ID: <span id="email-id"><%= users.email %></span></li>
+                        <% if (displayUsers) { %>
+                            <li>Username: <span id="user-id"><%= displayUsers.username %></span></li>
+                            <li>Employee ID: <span id="employee-id"><%= displayUsers.employeeID %></span></li>
+                            <li>Email ID: <span id="email-id"><%= displayUsers.email %></span></li>
+                        <% } else { %>
+                            <li>User information is not available</li>
+                        <% } %>
                     </ul>
                 </div>
             </nav1>

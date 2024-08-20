@@ -90,16 +90,16 @@
                 </div>
                 <div class="popup-manage">
                     <p>Email ID <i class="fas fa-envelope"></i></p>
-                    <p class="profile-email"><%= admins.email %></p>
+                    <p class="profile-email"><%= displayAdmin.email %></p>
                 </div>
                 <div class="popup-manage">
                     <p>Username <i class="fas fa-user"></i></p>
-                    <p><%= admins.username %></p>
+                    <p><%= displayAdmin.username %></p>
                 </div>
                 <div class="popup-manage">
                     <p>Employee ID <i class="fas fa-id-badge"></i></p>
-                    <p class="profile-email"><%= admins.employeeID %></p>
-                </div>                
+                    <p class="profile-email"><%= displayAdmin.employeeID %></p>
+                </div>               
             </div>
         </nav>
         <!-- NAVBAR -->
@@ -139,8 +139,7 @@
             <div class="table-data">
                 <div class="order">
                     <div class="head">
-                        <h3>Complaint</h3>
-                        <i class='bx bx-search' ></i>
+                        <h3>Complaints</h3>                        
                         <i class='bx bx-filter' ></i>
                     </div>
                     <table>

@@ -8,6 +8,31 @@ const Complaint = require('../models/complaint');
 const XLSX= require('xlsx');
 const path= require('path');
 const fs= require('fs');
+const upload = require('./multerConfig');
+
+//middleware to check if user is authenticated or not
+function isAuthenticatedUser(req,res,next) {
+    if(req.session.user && req.session.user.role == 'User')
+    {
+        return next();
+    }
+    else
+    {
+        res.redirect('/userlogin')
+    }
+}
+
+//middleware to check if admin is authenticated or not
+function isAuthenticatedAdmin(req,res,next) {
+    if(req.session.admin && req.session.admin.role == 'Admin')
+    {
+        return next();
+    }
+    else
+    {
+        res.redirect('/userlogin')
+    }
+}
 
 router.post('/logout', (req,res)=>{
     req.session.destroy(err=>{
@@ -52,6 +77,14 @@ router.post('/loginuser', async (req, res) => {
             return res.status(400).json({ message: 'OTP has expired' });
         }
 
+        //store user information in session
+        req.session.user = {
+            id: existingUser._id,
+            username:existingUser.username,
+            email:existingUser.email,
+            role:'User',
+        };
+
         res.status(200).json({ message: 'User logged in successfully' });
     } catch (error) {
         console.error('Error during user login:', error);
@@ -92,6 +125,14 @@ router.post('/loginadmin', async (req, res) => {
             return res.status(400).json({ message: 'OTP has expired' });
         }
 
+        //store user information in session
+        req.session.admin = {
+            id: existingAdmin._id,
+            username:existingAdmin.username,
+            email:existingAdmin.email,
+            role :'Admin'
+        };       
+
         res.status(200).json({ message: 'Admin logged in successfully' });
     } catch (error) {
         console.error('Error during admin login:', error);
@@ -117,15 +158,31 @@ router.post('/register', async (req, res) => {
   res.status(201).json({ message: "User registered successfully" });
 });
 
-router.post('/newcomplaint', async (req, res) => {
-    const { employeeName, employeeCode, complaintTitle, department, email, complaintDate, complaintDetails, complaintAttachment } = req.body;
+//Router to render file complaints page
+router.get('/filecomplaint', isAuthenticatedUser, async (req, res) => {
+    try {
+        console.log(req.session.user);
+        const email=req.session.user.email;
+        const displayUsers = await User.findOne({email});
+        console.log(displayUsers);
+        const complaintCode = await generateUniqueComplaintCode();
+        res.render('filecomplaint', { complaintCode, displayUsers });
+    } catch (error) {
+        console.error('Error generating complaint code:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post('/newcomplaint', upload.single('complaintAttachment'), async (req, res) => {
+    const { complaintCode, employeeName, employeeCode, complaintTitle, department, email, complaintDate, complaintDetails } = req.body;
 
     try {
-        const attachmentString = typeof complaintAttachment === 'object' ? JSON.stringify(complaintAttachment) : complaintAttachment;
+        const complaintAttachment = req.file ? req.file.path : null; // Store file path if file exists
         const existingUser = await User.findOne({ email });
 
         if (existingUser && existingUser.username === employeeName && existingUser.employeeID === employeeCode) {
             await Complaint.create({ 
+                complaintCode,
                 employeeName, 
                 employeeCode, 
                 complaintTitle, 
@@ -133,7 +190,7 @@ router.post('/newcomplaint', async (req, res) => {
                 email, 
                 complaintDate, 
                 complaintDetails, 
-                complaintAttachment: attachmentString
+                complaintAttachment
             });
             res.status(200).json({ message: 'Complaint submitted successfully' });
         } else {
@@ -145,16 +202,71 @@ router.post('/newcomplaint', async (req, res) => {
     }
 });
 
-router.get('/dashboard', async (req, res) => {
+router.get('/filter-search', async (req, res) => {
+    const { department, date, status } = req.query;
+    const filter = {
+        $and: []
+    };
+
+    // Add department condition if it's provided
+    if (department) {
+        filter.$and.push({ department });
+    }
+
+    if (date) {
+        const parsedDate = new Date(date);
+        if (!isNaN(parsedDate.getTime())) { // Valid date check
+            filter.$and.push({ complaintDate: parsedDate });
+        }
+    }
+
+    // Add status condition if it's provided
+    if (status) {
+        filter.$and.push({ status });
+    }
+
+    // If no filters are provided, use an empty filter
+    if (filter.$and.length === 0) {
+        delete filter.$and;
+    }
+
     try {
-        const users = await User.find({});
+        // Fetch complaints based on the filter criteria
+        const complaints = await Complaint.find(filter);
+
+        // Count the number of pending and solved complaints
+        const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
+        const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
+
+        // Render the results
+        res.render('totalcomplaints', {
+            complaints,
+            department,
+            date,
+            status,
+            pendingCount,
+            solvedCount
+        });
+    } catch (error) {
+        res.status(500).send('Error fetching complaints');
+    }
+});
+
+
+router.get('/dashboard', isAuthenticatedUser, async (req, res) => {
+    try {
+        //const users = await User.find({});
+        console.log(req.session.user);
+        const email=req.session.user.email;
+        const displayUsers = await User.findOne({email});
+        console.log(displayUsers);
         const admins = await Admin.find({});
         const complaints = await Complaint.find();
         const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
         const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
 
         res.render('dashboard', {
-            users,
+            displayUsers,
             admins,
             complaints,
             pendingCount,
@@ -165,16 +277,20 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
-router.get('/mycomplaint', async (req, res) => {
+router.get('/mycomplaint', isAuthenticatedUser, async (req, res) => {
     try {
-        const users = await User.find({});
+        //const users = await User.find({});
+        console.log(req.session.user);
+        const email=req.session.user.email;
+        const displayUsers = await User.findOne({email});
+        console.log(displayUsers);
         const admins = await Admin.find({});
         const complaints = await Complaint.find();
         const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
         const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
 
         res.render('mycomplaint', {
-            users,
+            displayUsers,
             admins,
             complaints,
             pendingCount,
@@ -202,10 +318,15 @@ router.get('/mycomplaints/:employeeID', async (req, res) => {
     }
 });
 
-router.get('/admindash', async (req, res) => {
+//route to render admin dashboard
+router.get('/admindash', isAuthenticatedAdmin, async (req, res) => {
     try {
         const users = await User.find({});
         const admins = await Admin.find({});
+        console.log(req.session.admin);
+        const email=req.session.admin.email;
+        const displayAdmin = await Admin.findOne({email});
+        console.log(displayAdmin);
         const complaints = await Complaint.find();
         //const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
         //const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
@@ -213,6 +334,7 @@ router.get('/admindash', async (req, res) => {
         res.render('admindash', {
             users,
             admins,
+            displayAdmin,
             complaints
         });
     } catch (error) {
@@ -222,10 +344,14 @@ router.get('/admindash', async (req, res) => {
 
 
 // Route to render the alluser page
-router.get('/alluser', async (req, res) => {
+router.get('/alluser', isAuthenticatedAdmin, async (req, res) => {
     try {
+        console.log(req.session.admin);
+        const email=req.session.admin.email;
+        const displayAdmin = await Admin.findOne({email});
+        console.log(displayAdmin);
         const users = await User.find({});
-        res.render('alluser', { users });
+        res.render('alluser', { users, displayAdmin });
     } catch (error) {
         console.error('Error fetching users:', error);
         res.status(500).send('Error fetching users');
@@ -233,10 +359,14 @@ router.get('/alluser', async (req, res) => {
 });
 
 // Route to render the totaladmin page
-router.get('/totaladmin', async (req, res) => {
+router.get('/totaladmin', isAuthenticatedAdmin, async (req, res) => {
     try {
         const admins = await Admin.find({});
-        res.render('totaladmin', { admins });
+        console.log(req.session.admin);
+        const email=req.session.admin.email;
+        const displayAdmin = await Admin.findOne({email});
+        console.log(displayAdmin);
+        res.render('totaladmin', { displayAdmin, admins });
     } catch (error) {
         console.error('Error fetching admins:', error);
         res.status(500).send('Error fetching admins');
@@ -244,16 +374,24 @@ router.get('/totaladmin', async (req, res) => {
 });
 
 //Router to display complaint data from server to the front end
-router.get('/totalcomplaints', async (req, res) => {
+router.get('/totalcomplaints', isAuthenticatedAdmin, async (req, res) => {
     try {
+        console.log(req.session.admin);
+        const email=req.session.admin.email;
+        const displayAdmin = await Admin.findOne({email});
+        console.log(displayAdmin);
         const complaints = await Complaint.find();
         const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
         const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
 
         res.render('totalcomplaints', {
+            displayAdmin,
             complaints,
             pendingCount,
-            solvedCount
+            solvedCount,
+            department: '',  // Or null, if that's more appropriate
+            date: '',
+            status: ''
         });
     } catch (error) {
         res.status(500).send(error.message);
@@ -273,6 +411,27 @@ router.get('/totalcomplaints/:id', (req, res) => {
         .catch(err => res.status(500).send('Error retrieving complaint data'));
 });
 
+// Update complaint status
+router.put('/totalcomplaints/:complaintCode/status', async (req, res) => {
+    try {
+        const complaintCode = req.params.complaintCode;
+        const { status } = req.body;
+
+        const complaint = await Complaint.findOne({ complaintCode: complaintCode });
+        if (!complaint) {
+            return res.status(404).json({ success: false, message: 'Complaint not found' });
+        }
+
+        complaint.status = status;
+        await complaint.save();
+
+        res.json({ success: true, message: 'Status updated successfully' });
+    } catch (error) {
+        console.error('Error updating complaint status:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 //route to get complaint counts for displaying in the chart
 router.get('/complaint-counts', async (req, res) => {
     try {
@@ -287,6 +446,15 @@ router.get('/complaint-counts', async (req, res) => {
         });
     } catch (error) {
         res.status(500).send(error.message);
+    }
+});
+
+// Route to handle file upload
+router.post('/upload', upload.single('file'), (req, res) => {
+    try {
+      res.send('File uploaded successfully');
+    } catch (error) {
+      res.status(500).send('Error uploading file');
     }
 });
 

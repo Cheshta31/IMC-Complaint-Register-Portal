@@ -89,16 +89,16 @@
                 </div>
                 <div class="popup-manage">
                     <p>Email ID <i class="fas fa-envelope"></i></p>
-                    <p class="profile-email">admin@gmail.com</p>
+                    <p class="profile-email"><%= displayAdmin.email %></p>
                 </div>
                 <div class="popup-manage">
                     <p>Username <i class="fas fa-user"></i></p>
-                    <p>ADMIN01</p>
+                    <p><%= displayAdmin.username %></p>
                 </div>
                 <div class="popup-manage">
                     <p>Employee ID <i class="fas fa-id-badge"></i></p>
-                    <p class="profile-email">1234</p>
-                </div>                
+                    <p class="profile-email"><%= displayAdmin.employeeID %></p>
+                </div>              
         </nav>
         <!-- NAVBAR -->
 
@@ -110,29 +110,30 @@
                         <div class="overview">
                             <div class="title">
                                 <i class="uil uil-chart"></i>
-                                <span class="text">Add New User</span>
+                                <span class="text"><h1>Add New User</h1></span>
                             </div>
-                        <div class="form-group">
-                            <label for="username">User Name *</label>
-                            <input type="text" id="username" name="username" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="employeeID">Employee ID *</label>
-                            <input type="text" id="employeeID" name="employeeID" required>
-                        </div>                                              
-                        <div class="form-group">
-                            <label for="email">Email *</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Set Password *</label>
-                            <input type="password" id="password" name="password" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="username">User Name *</label>
+                                <input type="text" id="username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="employeeID">Employee ID *</label>
+                                <input type="text" id="employeeID" name="employeeID" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Set Password *</label>
+                                <input type="password" id="password" name="password" required>
+                            </div>
                         </div>
                         <div class="form-group">
                             <button type="submit" onclick="addUser(event)">Register</button>
                         </div>
                     </form>
-                 
                 </div>
             </div>
 

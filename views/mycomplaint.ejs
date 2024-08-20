@@ -74,9 +74,13 @@
                 <div id="dropdown" class="dropdown-content">
                     <img src="/images/avatar.svg" class="avatar-img" />
                     <ul>
-                        <li>User ID: <span id="user-id">12345</span></li>
-                        <li>Employee ID: <span id="employee-id">67890</span></li>
-                        <li>Email ID: <span id="email-id">user@example.com</span></li>
+                        <% if (displayUsers) { %>
+                            <li>Username: <span id="user-id"><%= displayUsers.username %></span></li>
+                            <li>Employee ID: <span id="employee-id"><%= displayUsers.employeeID %></span></li>
+                            <li>Email ID: <span id="email-id"><%= displayUsers.email %></span></li>
+                        <% } else { %>
+                            <li>User information is not available</li>
+                        <% } %>
                     </ul>
                 </div>
             </nav1>
@@ -113,50 +117,97 @@
                     <span class="text">My Complaints</span>
                 </div>
 
-                <div class="activity-data">
+                <!--<div class="activity-data">
+                    <% complaints.forEach(complaint => { %>
                     <div class="data names">
                         <span class="data-title">Name</span>
-                        <span class="data-list">USER</span>
-                        <span class="data-list">USER</span>
-                        <span class="data-list">USER</span>
-                        <span class="data-list">USER</span>
+                        <span class="data-list"><%= complaint.employeeName %></span>                        
                     </div>
                     <div class="data email">
                         <span class="data-title">Email</span>
-                        <span class="data-list">User@gmail.com</span>
-                        <span class="data-list">User@gmail.com</span> 
-                        <span class="data-list">User@gmail.com</span>
-                        <span class="data-list">User@gmail.com</span> 
+                        <span class="data-list"><%= complaint.email %></span>                      
                     </div>
                     <div class="data complaint">
                         <span class="data-title">Date</span>
-                        <span class="data-list">2024-02-24</span>
-                        <span class="data-list">2024-07-04</span>
-                        <span class="data-list">2024-02-24</span>
-                        <span class="data-list">2024-07-04</span>
+                        <span class="data-list"><%= new Date(complaint.complaintDate).toLocaleDateString() %></span>                        
                     </div>
                     <div class="data status">
                         <span class="data-title">Complaint Status</span>
-                        <span class="data-list">Completed</span>
-                        <span class="data-list">Pending</span>
-                        <span class="data-list">Completed</span>
-                        <span class="data-list">Pending</span>
+                        <span class="data-list <%= complaint.status.toLowerCase().replace(' ', '-') %>"><%= complaint.status %></span>                        
                     </div>
                     <div class="data status">
                         <span class="data-title">Complaint View</span>
-                        <button class="data-view" onclick="openModal('view1')">view1</button>
-                        <button class="data-view" onclick="openModal('view2')">view2</button>
-                        <button class="data-view" onclick="openModal('view1')">view1</button>
-                        <button class="data-view" onclick="openModal('view2')">view2</button>
+                        <button class="data-view" onclick="openModal('view1')">View</button>                        
                     </div>
-                
+                    <% }) %>
                     <div id="modal" class="modal">
                         <div class="modal-content">
                             <span class="close" onclick="closeModal()">&times;</span>
                             <p id="modal-content"></p>
                         </div>
                     </div>
+                </div>-->
+
+                <div class="table-data">
+                    <div class="order">
+                        <div class="head">
+                            <h3>Complaint</h3>
+                            <!--<form action="/filter-search" method="GET">
+                                <select name="department">
+                                  <option value="">All Departments</option>
+                                  <option value="IT" <%= status === 'IT' ? 'selected' : '' %>>IT</option>
+                                  <option value="HR" <%= status === 'HR' ? 'selected' : '' %>>HR</option>
+                                  <option value="Finance" <%= status === 'Finance' ? 'selected' : '' %>>Finance</option>
+                                  <option value="Operations" <%= status === 'Operations' ? 'selected' : '' %>>Operations</option>
+                                  <option value="Admin" <%= status === 'Admin' ? 'selected' : '' %>>Admin</option>
+    
+                                </select>
+                              
+                                <input type="date" name="date" value="<%= date %>">
+                              
+                                <select name="status">
+                                  <option value="">All Statuses</option>                                  
+                                  <option value="Pending" <%= department === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                  <option value="In Progress" <%= department === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                                  <option value="Solved" <%= department === 'Solved' ? 'selected' : '' %>>Solved</option>
+                                </select>
+                              
+                                <button type="submit"><i class='bx bx-filter'></i> Apply Filters</button>
+                                <button type="reset" onclick="window.location.href='/filter-search';">Clear Filters</button> 
+                            </form>  -->                    
+                                                      
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Department</th>
+                                    <th>E-mail</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>View Complaint</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% complaints.forEach(complaint => { %>
+                                    <tr>
+                                        <td>
+                                            <img src="/images/avatar.svg">
+                                            <p><%= complaint.employeeName %></p>
+                                        </td>
+                                        <td><%= complaint.department %></td>
+                                        <td><%= complaint.email %></td>
+                                        <td><%= new Date(complaint.complaintDate).toLocaleDateString() %></td>
+                                        <td><span class="status <%= complaint.status.toLowerCase().replace(' ', '-') %>"><%= complaint.status %></span></td>
+                                        <td><button class="data-view" onclick="openModal(`<%= complaint._id %>`)">View</button></td>                                  
+                                                                      
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+    
             </div>
         </div>
     </section>

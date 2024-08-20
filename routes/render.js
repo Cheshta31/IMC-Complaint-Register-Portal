@@ -11,9 +11,4 @@ router.get('/userlogin', (req, res) => {
 });
 
 
-router.get('/filecomplaint', (req, res) => {
-    res.render('filecomplaint'); 
-});
-
-
 module.exports = router;

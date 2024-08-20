@@ -420,6 +420,45 @@ body {
 	grid-gap: 16px;
 	flex-wrap: wrap;
 }
+
+.form-row {
+    display: flex;
+    gap: 20px; /* Space between form groups */
+    flex-wrap: wrap; /* Adjust to allow wrapping if screen size is small */
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px; /* Minimum width of each input field */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
 #content main .head-title .left h1 {
 	font-size: 36px;
 	font-weight: 600;
@@ -454,9 +493,6 @@ body {
 	grid-gap: 10px;
 	font-weight: 500;
 }
-
-
-
 
 #content main .box-info {
 	display: grid;

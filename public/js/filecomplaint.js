@@ -1,3 +1,6 @@
+const crypto = require('crypto');
+const Complaint = require('./models/complaint');
+
 const body = document.querySelector("body"),
       modeToggle = body.querySelector(".mode-toggle");
       sidebar = body.querySelector("nav");
@@ -71,6 +74,7 @@ function toggleDropdown() {
     }
 }
 
+
 //logout
 function logout() {
     // Add logout functionality here
@@ -116,10 +120,7 @@ async function submitcomplaint(event) {
     try {
         const response = await fetch('/newcomplaint', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            body: formData
         });
 
         if (response.ok) {

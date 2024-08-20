@@ -85,18 +85,18 @@
                         <p class="profile-name">ADMIN</p>
                     </div>
                 </div>
-                <div class="popup-sync">
+                <div class="popup-manage">
                     <p>Email ID <i class="fas fa-envelope"></i></p>
-                    <p class="profile-email">admin@gmail.com</p>
+                    <p class="profile-email"><%= displayAdmin.email %></p>
                 </div>
                 <div class="popup-manage">
                     <p>Username <i class="fas fa-user"></i></p>
-                    <p>ADMIN01</p>
+                    <p><%= displayAdmin.username %></p>
                 </div>
                 <div class="popup-manage">
                     <p>Employee ID <i class="fas fa-id-badge"></i></p>
-                    <p class="profile-email">1234</p>
-                </div>               
+                    <p class="profile-email"><%= displayAdmin.employeeID %></p>
+                </div>              
             </div>
         </nav>
         <!-- NAVBAR -->
@@ -138,8 +138,30 @@
                 <div class="order">
                     <div class="head">
                         <h3>Complaint</h3>
-                        <i class='bx bx-search'></i>
-                        <i class='bx bx-filter'></i>
+                        <form action="/filter-search" method="GET">
+                            <select name="department">
+                              <option value="">All Departments</option>
+                              <option value="IT" <%= status === 'IT' ? 'selected' : '' %>>IT</option>
+                              <option value="HR" <%= status === 'HR' ? 'selected' : '' %>>HR</option>
+                              <option value="Finance" <%= status === 'Finance' ? 'selected' : '' %>>Finance</option>
+                              <option value="Operations" <%= status === 'Operations' ? 'selected' : '' %>>Operations</option>
+                              <option value="Admin" <%= status === 'Admin' ? 'selected' : '' %>>Admin</option>
+
+                            </select>
+                          
+                            <input type="date" name="date" value="<%= date %>">
+                          
+                            <select name="status">
+                              <option value="">All Statuses</option>                                  
+                              <option value="Pending" <%= department === 'Pending' ? 'selected' : '' %>>Pending</option>
+                              <option value="In Progress" <%= department === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                              <option value="Solved" <%= department === 'Solved' ? 'selected' : '' %>>Solved</option>
+                            </select>
+                          
+                            <button type="submit"><i class='bx bx-filter'></i> Apply Filters</button>
+                            <button type="reset" onclick="window.location.href='/filter-search';">Clear Filters</button> 
+                        </form>                      
+                                                  
                     </div>
                     <table>
                         <thead>
@@ -163,7 +185,8 @@
                                     <td><%= complaint.email %></td>
                                     <td><%= new Date(complaint.complaintDate).toLocaleDateString() %></td>
                                     <td><span class="status <%= complaint.status.toLowerCase().replace(' ', '-') %>"><%= complaint.status %></span></td>
-                                    <td><button class="data-view" onclick="openModal('<%= complaint._id %>')">View</button></td>
+                                    <td><button class="data-view" onclick="openModal(`<%= complaint._id %>`)">View</button></td>                                  
+                                                                  
                                 </tr>
                             <% }) %>
                         </tbody>
@@ -177,9 +200,8 @@
                     <span class="close" onclick="closeModal()">&times;</span>
                     <h2>Complaint Details</h2>
                     <div id="complaintData"></div>
-                    <div id="documentContainer">
-                        <!-- Document link or preview will be inserted here -->
-                    </div>
+                    <div id="documentContainer"></div>                   
+                    <div id="statusContainer"></div>
                 </div>
             </div>
             

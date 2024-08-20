@@ -1,4 +1,6 @@
 const allSideMenu = document.querySelectorAll('#sidebar .side-menu.top li a');
+document.addEventListener('DOMContentLoaded', createChart);
+
 
 allSideMenu.forEach(item=> {
 	const li = item.parentElement;
@@ -115,7 +117,6 @@ async function createChart() {
     new Chart(ctx, config);
 }
 
-document.addEventListener('DOMContentLoaded', createChart);
 
 function logout() {
     // Add logout functionality here
