@@ -4,7 +4,7 @@ const router = express.Router();
 const User = require('../models/user');
 const Admin = require('../models/admin');
 const OTP = require('../models/otp');
-const Complaint = require('../models/complaint');
+const { Complaint, generateUniqueComplaintCode } = require('../models/complaint');
 const XLSX= require('xlsx');
 const path= require('path');
 const fs= require('fs');
@@ -202,6 +202,7 @@ router.post('/newcomplaint', upload.single('complaintAttachment'), async (req, r
     }
 });
 
+//filter for total complaints page
 router.get('/filter-search', async (req, res) => {
     const { department, date, status } = req.query;
     const filter = {
@@ -231,6 +232,10 @@ router.get('/filter-search', async (req, res) => {
     }
 
     try {
+        console.log(req.session.admin);
+        const email=req.session.admin.email;
+        const displayAdmin = await Admin.findOne({email});
+        console.log(displayAdmin);
         // Fetch complaints based on the filter criteria
         const complaints = await Complaint.find(filter);
 
@@ -240,6 +245,7 @@ router.get('/filter-search', async (req, res) => {
 
         // Render the results
         res.render('totalcomplaints', {
+            displayAdmin,
             complaints,
             department,
             date,
@@ -260,13 +266,16 @@ router.get('/dashboard', isAuthenticatedUser, async (req, res) => {
         const email=req.session.user.email;
         const displayUsers = await User.findOne({email});
         console.log(displayUsers);
+        const displayComplaints = await Complaint.find({email,status: { $in: ['Pending','In Progress' ,'Completed'  ] }});
+        console.log(displayComplaints);
         const admins = await Admin.find({});
         const complaints = await Complaint.find();
-        const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
-        const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
+        const pendingCount = await Complaint.countDocuments({ email, status: 'Pending' });
+        const solvedCount = await Complaint.countDocuments({ email, status: 'Completed' });
 
         res.render('dashboard', {
             displayUsers,
+            displayComplaints,
             admins,
             complaints,
             pendingCount,
@@ -285,16 +294,26 @@ router.get('/mycomplaint', isAuthenticatedUser, async (req, res) => {
         const displayUsers = await User.findOne({email});
         console.log(displayUsers);
         const admins = await Admin.find({});
-        const complaints = await Complaint.find();
-        const pendingCount = await Complaint.countDocuments({ status: 'Pending' });
-        const solvedCount = await Complaint.countDocuments({ status: 'Completed' });
+        //const complaints = await Complaint.find();
+        const displayComplaints = await Complaint.find({email,status: { $in: ['Pending','In Progress' ,'Completed'  ] }});
+        console.log(displayComplaints);
+        const pendingCount = await Complaint.countDocuments({ email, status: 'Pending' });
+        const solvedCount = await Complaint.countDocuments({ email,status: 'Completed' });
+        
 
-        res.render('mycomplaint', {
+        if (!displayUsers) {
+            return res.status(404).send('User not found');
+        }
+
+        res.render('mycomplaint', {        
             displayUsers,
-            admins,
-            complaints,
+            displayComplaints,
+            admins,        
             pendingCount,
-            solvedCount
+            solvedCount,
+            department: '',  // Or null, if that's more appropriate
+            date: '',
+            status: ''
         });
     } catch (error) {
         res.status(500).send(error.message);
@@ -315,6 +334,77 @@ router.get('/mycomplaints/:employeeID', async (req, res) => {
         res.render('userComplaints', { user, complaints });
     } catch (err) {
         res.status(500).send(err.message);
+    }
+});
+
+// Route to get a specific complaint by ID
+router.get('/mycomplaint/:id', (req, res) => {
+    const complaintId = req.params.id;
+    Complaint.findById(complaintId)
+        .then(complaint => {
+            if (!complaint) {
+                return res.status(404).send('Complaint not found');
+            }
+            res.json(complaint);
+        })
+        .catch(err => res.status(500).send('Error retrieving complaint data'));
+});
+
+//filter for my complaint page
+router.get('/search-filter', async (req, res) => {
+    const { department, date, status } = req.query;
+    const filter = {
+        $and: [{ email: req.session.user.email }]
+    };
+    console.log(filter);
+
+    // Add department condition if it's provided
+    if (department) {
+        filter.$and.push({ department });
+    }
+
+    if (date) {
+        const parsedDate = new Date(date);
+        if (!isNaN(parsedDate.getTime())) { // Valid date check
+            filter.$and.push({ complaintDate: parsedDate });
+        }
+    }
+
+    // Add status condition if it's provided
+    if (status) {
+        filter.$and.push({ status });
+    }
+
+    // If no filters are provided, use an empty filter
+    if (filter.$and.length === 0) {
+        delete filter.$and;
+    }
+
+    try {
+        console.log(req.session.user);
+        const email=req.session.user.email;
+        const displayUsers = await User.findOne({email});
+        console.log(displayUsers);
+        // Fetch complaints based on the filter criteria
+        //const complaints = await Complaint.find(filter);
+        const displayComplaints = await Complaint.find({filter});
+        
+        // Count the number of pending and solved complaints
+        const pendingCount = await Complaint.countDocuments({ email, status: 'Pending' });
+        const solvedCount = await Complaint.countDocuments({ email, status: 'Completed' });
+
+        // Render the results
+        res.render('mycomplaint', {
+            displayUsers,
+            displayComplaints,
+            department,
+            date,
+            status,
+            pendingCount,
+            solvedCount
+        });
+    } catch (error) {
+        res.status(500).send('Error fetching complaints');
     }
 });
 

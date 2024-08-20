@@ -62,23 +62,78 @@ window.onclick = function(event) {
     }
 }
 
-function openModal(view) {
-    var modal = document.getElementById("modal");
-    var modalContent = document.getElementById("modal-content");
+function openModal(_id) {
+    fetch(`/mycomplaint/${_id}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('complaintData').innerHTML = `
+                <p><strong>Complaint Code:</strong> ${data.complaintCode}</p>
+                <p><strong>Employee Name:</strong> ${data.employeeName}</p>
+                <p><strong>Employee Code:</strong> ${data.employeeCode}</p>
+                <p><strong>Title:</strong> ${data.complaintTitle}</p>
+                <p><strong>Department:</strong> ${data.department}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>Date:</strong> ${new Date(data.complaintDate).toLocaleDateString()}</p>
+                <p><strong>Status:</strong> ${data.status}</p>
+                <p><strong>Description:</strong> ${data.complaintDetails}</p>
+            `;
+			// Add document link or preview
+			const documentContainer = document.getElementById('documentContainer');
+			if (data.complaintAttachment) {
+                // Assuming complaintAttachment is a path relative to the 'uploads' directory
+                const fileUrl = `/${data.complaintAttachment}`;
+                documentContainer.innerHTML = `
+                    <p><strong>Attached Document:</strong></p>
+                    <a href="${fileUrl}" target="_blank">View Complaint Document</a>
+                `;
+			} else {
+				documentContainer.innerHTML = '<p>No document attached.</p>';
+			}
 
-    if (view === 'view1') {
-        modalContent.innerHTML = "Content for View 1";
-    } else if (view === 'view2') {
-        modalContent.innerHTML = "Content for View 2";
-    }
-
-    modal.style.display = "block";
+            // Status update section
+            /*const statusContainer = document.getElementById('statusContainer');
+            statusContainer.innerHTML = `
+                <label for="statusSelect"><strong>Update Status:</strong></label>
+                <select id="statusSelect">                    
+                    <option value="In Progress" ${data.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                    <option value="Completed" ${data.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                </select>
+                <button onclick="updateComplaintStatus('${data.complaintCode}')">Update Status</button>
+            `;*/
+ 
+			document.getElementById('complaintModal').style.display = "block";
+        })
+        .catch(error => console.error('Error fetching complaint data:', error));
 }
 
 function closeModal() {
-    var modal = document.getElementById("modal");
-    modal.style.display = "none";
+    document.getElementById('complaintModal').style.display = "none";
 }
+
+/*function updateComplaintStatus(complaintCode) {
+    console.log('Updating status for Complaint Code:', complaintCode);
+    
+    const newStatus = document.getElementById('statusSelect').value;
+
+    fetch(`/totalcomplaints/${complaintCode}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Status updated successfully!');
+            document.getElementById('complaintModal').style.display = "none";
+            // Optionally, refresh the page or reload the complaint list
+        } else {
+            alert('Failed to update status.');
+        }
+    })
+    .catch(error => console.error('Error updating complaint status:', error));
+}*/
 
 // Close the modal when clicking outside of the modal content
 window.onclick = function(event) {

@@ -84,4 +84,4 @@ complaintSchema.pre('save', async function(next) {
 
 const Complaint = mongoose.model('Complaint', complaintSchema);
 
-module.exports = Complaint;
+module.exports = { Complaint, generateUniqueComplaintCode };

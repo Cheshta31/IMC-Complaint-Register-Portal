@@ -101,11 +101,15 @@
                     </div>                        
                     <div class="form-group">
                         <label for="employeeName">Employee Name *</label>
-                        <input type="text" id="employeeName" name="employeeName" required>
+                        <input type="text" id="employeeName" name="employeeName" value="<%= displayUsers.username %>" readonly>
                     </div>
                     <div class="form-group">
                         <label for="employeeCode">Employee Code *</label>
-                        <input type="text" id="employeeCode" name="employeeCode" required>
+                        <input type="text" id="employeeCode" name="employeeCode" value="<%= displayUsers.employeeID %>" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" value="<%= displayUsers.email %>" readonly>
                     </div>
                     <div class="form-group">
                         <label for="complaintTitle">Complaint Title *</label>
@@ -121,11 +125,7 @@
                             <option value="Operations">Operations</option>
                             <option value="Admin">Admin</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email *</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
+                    </div>                   
                     <div class="form-group">
                         <label for="complaintDate">Complaint Date *</label>
                         <input type="date" id="complaintDate" name="complaintDate" required>

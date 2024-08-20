@@ -97,7 +97,7 @@
                     <div class="box box1">
                         <i class="uil uil-comments"></i>
                         <span class="text">My all Complaints</span>
-                        <span class="number"><%= complaints.length %></span>
+                        <span class="number"><%= displayComplaints.length %></span>
                     </div>
                     <div class="box box2">
                         <i class="uil uil-clipboard-alt"></i>
@@ -114,45 +114,13 @@
 
             <div class="activity">
                 <div class="title">
-                    <span class="text">My Complaints</span>
-                </div>
-
-                <!--<div class="activity-data">
-                    <% complaints.forEach(complaint => { %>
-                    <div class="data names">
-                        <span class="data-title">Name</span>
-                        <span class="data-list"><%= complaint.employeeName %></span>                        
-                    </div>
-                    <div class="data email">
-                        <span class="data-title">Email</span>
-                        <span class="data-list"><%= complaint.email %></span>                      
-                    </div>
-                    <div class="data complaint">
-                        <span class="data-title">Date</span>
-                        <span class="data-list"><%= new Date(complaint.complaintDate).toLocaleDateString() %></span>                        
-                    </div>
-                    <div class="data status">
-                        <span class="data-title">Complaint Status</span>
-                        <span class="data-list <%= complaint.status.toLowerCase().replace(' ', '-') %>"><%= complaint.status %></span>                        
-                    </div>
-                    <div class="data status">
-                        <span class="data-title">Complaint View</span>
-                        <button class="data-view" onclick="openModal('view1')">View</button>                        
-                    </div>
-                    <% }) %>
-                    <div id="modal" class="modal">
-                        <div class="modal-content">
-                            <span class="close" onclick="closeModal()">&times;</span>
-                            <p id="modal-content"></p>
-                        </div>
-                    </div>
-                </div>-->
+                    <h2>My Complaints</h2>
+                </div>              
 
                 <div class="table-data">
                     <div class="order">
-                        <div class="head">
-                            <h3>Complaint</h3>
-                            <!--<form action="/filter-search" method="GET">
+                        <div class="head">                                                                      
+                            <form action="/search-filter" method="GET">
                                 <select name="department">
                                   <option value="">All Departments</option>
                                   <option value="IT" <%= status === 'IT' ? 'selected' : '' %>>IT</option>
@@ -173,9 +141,8 @@
                                 </select>
                               
                                 <button type="submit"><i class='bx bx-filter'></i> Apply Filters</button>
-                                <button type="reset" onclick="window.location.href='/filter-search';">Clear Filters</button> 
-                            </form>  -->                    
-                                                      
+                                <button type="reset" onclick="window.location.href='/search-filter';">Clear Filters</button> 
+                            </form>                           
                         </div>
                         <table>
                             <thead>
@@ -189,7 +156,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% complaints.forEach(complaint => { %>
+                                <% displayComplaints.forEach(complaint => { %>
                                     <tr>
                                         <td>
                                             <img src="/images/avatar.svg">
@@ -207,7 +174,17 @@
                         </table>
                     </div>
                 </div>
-    
+
+                <!-- Modal Structure -->
+                <div id="complaintModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal()">&times;</span>
+                        <h2>Complaint Details</h2>
+                        <div id="complaintData"></div>
+                        <div id="documentContainer"></div>                   
+                        <div id="statusContainer"></div>
+                    </div>
+                </div>                         
             </div>
         </div>
     </section>
