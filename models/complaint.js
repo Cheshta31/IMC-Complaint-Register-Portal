@@ -30,8 +30,7 @@ const complaintSchema = new mongoose.Schema({
     },
     complaintDate: {
         type: Date,
-        required: true,
-        //default: Date.now
+        default: Date.now
     },
     complaintDetails: {
         type: String,

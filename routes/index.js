@@ -580,9 +580,10 @@ router.delete('/totaladmin/:employeeID', async (req, res) => {
 
 router.get('/download/excel', async (req,res) => {
     try {
-        const complaints = await Complaint.find({} , 'employeeName employeeCode complaintTitle department email complaintDetails status').lean();
+        const complaints = await Complaint.find({} , 'complaintCode employeeName employeeCode complaintTitle department email complaintDetails status').lean();
         console.log(complaints);
         const dataToExport = complaints.map(complaint => ({
+            Complaint_Code:complaint.complaintCode,
             Employee_Name:complaint.employeeName,
             Employee_Code:complaint.employeeCode,
             Complaint_Title:complaint.complaintTitle,
@@ -614,9 +615,10 @@ router.get('/download/excel', async (req,res) => {
 //download excel file for pending complaints
 router.get('/download/pending-excel', async (req,res) => {
     try {
-        const complaints = await Complaint.find({status:'Pending'} , 'employeeName employeeCode complaintTitle department email complaintDetails status').lean();
+        const complaints = await Complaint.find({status:'Pending'} , 'complaintCode employeeName employeeCode complaintTitle department email complaintDetails status').lean();
         console.log(complaints);
         const dataToExport = complaints.map(complaint => ({
+            Complaint_Code:complaint.complaintCode,
             Employee_Name:complaint.employeeName,
             Employee_Code:complaint.employeeCode,
             Complaint_Title:complaint.complaintTitle,
@@ -648,9 +650,10 @@ router.get('/download/pending-excel', async (req,res) => {
 //download excel file for solved complaints
 router.get('/download/solved-excel', async (req,res) => {
     try {
-        const complaints = await Complaint.find({status:'Completed'} , 'employeeName employeeCode complaintTitle department email complaintDetails status').lean();
+        const complaints = await Complaint.find({status:'Completed'} , 'complaintCode employeeName employeeCode complaintTitle department email complaintDetails status').lean();
         console.log(complaints);
         const dataToExport = complaints.map(complaint => ({
+            Complaint_Code:complaint.complaintCode,
             Employee_Name:complaint.employeeName,
             Employee_Code:complaint.employeeCode,
             Complaint_Title:complaint.complaintTitle,
@@ -678,5 +681,64 @@ router.get('/download/solved-excel', async (req,res) => {
         res.status(500).send('Error generating solved complaints excel file');
     }
 })
+
+router.get('/download/user-excel', async (req,res) => {
+    try {
+        const users = await User.find({} , 'username employeeID email').lean();
+        console.log(users);
+        const dataToExport = users.map(user => ({
+            User_Name:user.username,
+            Employee_Code:user.employeeID,
+            Employee_Email:user.email,
+        }))
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook,worksheet,'Users');
+        const filePath = path.join(__dirname,'total-users.xlsx');
+        XLSX.writeFile(workbook,filePath);
+        res.download(filePath,(err) => 
+        {
+            if(err)
+            {
+                console.log(err);
+            }
+            fs.unlinkSync(filePath);
+        });
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).send('Error generating excel file for user');
+    }
+})
+
+router.get('/download/admin-excel', async (req,res) => {
+    try {
+        const admins = await Admin.find({} , 'username employeeID email').lean();
+        console.log(admins);
+        const dataToExport = admins.map(admin => ({
+            User_Name:admin.username,
+            Employee_Code:admin.employeeID,
+            Employee_Email:admin.email,
+        }))
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook,worksheet,'Admins');
+        const filePath = path.join(__dirname,'total-admins.xlsx');
+        XLSX.writeFile(workbook,filePath);
+        res.download(filePath,(err) => 
+        {
+            if(err)
+            {
+                console.log(err);
+            }
+            fs.unlinkSync(filePath);
+        });
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).send('Error generating excel file for admins');
+    }
+})
+
 
 module.exports = router;
