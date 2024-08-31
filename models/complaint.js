@@ -54,7 +54,7 @@ async function generateUniqueComplaintCode() {
 
     do {
         // Generate a random code
-        code = 'CMP-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        code = 'CMP-' + Math.floor(Math.random()*10000000);//.toString(36).substr(2, 9).toUpperCase();
 
         // Check if the code already exists in the database
         existingComplaint = await Complaint.findOne({ complaintCode: code });

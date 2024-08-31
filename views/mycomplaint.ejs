@@ -75,7 +75,7 @@
                     <img src="/images/avatar.svg" class="avatar-img" />
                     <ul>
                         <% if (displayUsers) { %>
-                            <li>Username: <span id="user-id"><%= displayUsers.username %></span></li>
+                            <li>User ID: <span id="user-id"><%= displayUsers.username %></span></li>
                             <li>Employee ID: <span id="employee-id"><%= displayUsers.employeeID %></span></li>
                             <li>Email ID: <span id="email-id"><%= displayUsers.email %></span></li>
                         <% } else { %>
@@ -118,32 +118,7 @@
                 </div>              
 
                 <div class="table-data">
-                    <div class="order">
-                        <div class="head">                                                                      
-                            <form action="/search-filter" method="GET">
-                                <select name="department">
-                                  <option value="">All Departments</option>
-                                  <option value="IT" <%= status === 'IT' ? 'selected' : '' %>>IT</option>
-                                  <option value="HR" <%= status === 'HR' ? 'selected' : '' %>>HR</option>
-                                  <option value="Finance" <%= status === 'Finance' ? 'selected' : '' %>>Finance</option>
-                                  <option value="Operations" <%= status === 'Operations' ? 'selected' : '' %>>Operations</option>
-                                  <option value="Admin" <%= status === 'Admin' ? 'selected' : '' %>>Admin</option>
-    
-                                </select>
-                              
-                                <input type="date" name="date" value="<%= date %>">
-                              
-                                <select name="status">
-                                  <option value="">All Statuses</option>                                  
-                                  <option value="Pending" <%= department === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                  <option value="In Progress" <%= department === 'In Progress' ? 'selected' : '' %>>In Progress</option>
-                                  <option value="Solved" <%= department === 'Solved' ? 'selected' : '' %>>Solved</option>
-                                </select>
-                              
-                                <button type="submit"><i class='bx bx-filter'></i> Apply Filters</button>
-                                <button type="reset" onclick="window.location.href='/search-filter';">Clear Filters</button> 
-                            </form>                           
-                        </div>
+                    <div class="order">                       
                         <table>
                             <thead>
                                 <tr>

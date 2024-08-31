@@ -334,12 +334,16 @@ nav.close ~ .dashboard .top{
 .boxes .box.box3{
     background-color: var(--box3-color);
 }
+
+
 .dash-content .activity .activity-data{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     width: 100%;
+    overflow: scroll;
+    max-height: 300px;
 }
+
+
+
 .activity .activity-data{
     display: flex;
 }
@@ -348,6 +352,12 @@ nav.close ~ .dashboard .top{
     flex-direction: column;
     margin: 0 15px;
 }
+
+.data{
+    position: inherit;
+    display: contents;
+}
+
 .activity-data .data-title{
     font-size: 20px;
     font-weight: 500;

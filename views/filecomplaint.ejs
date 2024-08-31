@@ -75,7 +75,7 @@
                     <img src="/images/avatar.svg" class="avatar-img" />
                     <ul>
                         <% if (displayUsers) { %>
-                            <li>Username: <span id="user-id"><%= displayUsers.username %></span></li>
+                            <li>User ID: <span id="user-id"><%= displayUsers.username %></span></li>
                             <li>Employee ID: <span id="employee-id"><%= displayUsers.employeeID %></span></li>
                             <li>Email ID: <span id="email-id"><%= displayUsers.email %></span></li>
                         <% } else { %>
@@ -125,11 +125,8 @@
                             <option value="Operations">Operations</option>
                             <option value="Admin">Admin</option>
                         </select>
-                    </div>                   
-                    <div class="form-group">
-                        <label for="complaintDate">Complaint Date *</label>
-                        <input type="date" id="complaintDate" name="complaintDate" readonly>
-                    </div>
+                    </div>                 
+                    
                     <div class="form-group">
                         <label for="complaintDetails">Complaint Details *</label>
                         <textarea id="complaintDetails" name="complaintDetails" rows="4" required></textarea>

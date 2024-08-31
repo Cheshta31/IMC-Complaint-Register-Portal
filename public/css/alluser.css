@@ -402,7 +402,9 @@ body {
 /* NAVBAR */
 
 
-
+.profile-button{
+	margin-left: 1025px;
+}
 
 
 /* MAIN */
@@ -495,10 +497,9 @@ button[type="submit"]:hover {
 }
 
 #content main .box-info {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-	grid-gap: 24px;
-	margin-top: 36px;
+	width: 100%;
+    overflow: scroll;
+    max-height: 300px;
 }
 #content main .box-info li {
 	padding: 24px;
@@ -819,6 +820,7 @@ button[type="submit"]:hover {
 
 
 
+
 footer{
     height: 400px;
     width: 100%;
@@ -957,6 +959,7 @@ footer .copyright{
         left:100%;
     }
 }
+
 
 .download-button {
 	display: flex;

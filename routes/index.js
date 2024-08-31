@@ -174,7 +174,7 @@ router.get('/filecomplaint', isAuthenticatedUser, async (req, res) => {
 });
 
 router.post('/newcomplaint', upload.single('complaintAttachment'), async (req, res) => {
-    const { complaintCode, employeeName, employeeCode, complaintTitle, department, email, complaintDate, complaintDetails } = req.body;
+    const { complaintCode, employeeName, employeeCode, complaintTitle, department, email, complaintDetails } = req.body;
 
     try {
         const complaintAttachment = req.file ? req.file.path : null; // Store file path if file exists
@@ -187,8 +187,7 @@ router.post('/newcomplaint', upload.single('complaintAttachment'), async (req, r
                 employeeCode, 
                 complaintTitle, 
                 department, 
-                email, 
-                complaintDate, 
+                email,  
                 complaintDetails, 
                 complaintAttachment
             });
@@ -687,7 +686,7 @@ router.get('/download/user-excel', async (req,res) => {
         const users = await User.find({} , 'username employeeID email').lean();
         console.log(users);
         const dataToExport = users.map(user => ({
-            User_Name:user.username,
+            User_ID:user.username,
             Employee_Code:user.employeeID,
             Employee_Email:user.email,
         }))
@@ -716,7 +715,7 @@ router.get('/download/admin-excel', async (req,res) => {
         const admins = await Admin.find({} , 'username employeeID email').lean();
         console.log(admins);
         const dataToExport = admins.map(admin => ({
-            User_Name:admin.username,
+            User_ID:admin.username,
             Employee_Code:admin.employeeID,
             Employee_Email:admin.email,
         }))

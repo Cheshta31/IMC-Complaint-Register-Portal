@@ -302,9 +302,9 @@ body {
 }
 /* NAVBAR */
 
-
-
-
+.profile-button{
+	margin-left: 1025px;
+}
 
 /* MAIN */
 #content main {

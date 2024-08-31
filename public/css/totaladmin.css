@@ -373,7 +373,9 @@ body {
 /* NAVBAR */
 
 
-
+.profile-button{
+	margin-left: 1025px;
+}
 
 
 /* MAIN */
@@ -446,6 +448,12 @@ body {
 
 .user-button:hover {
     background-color: rgb(31, 150, 31);
+}
+
+#content main .box-info {
+	width: 100%;
+    overflow: scroll;
+    max-height: 300px;
 }
 
 
